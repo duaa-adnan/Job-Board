@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Job Board</title>
+</head>
+<body>
+    <h1>Job Board</h1>
+        <h2>New job</h2>
+    <form method="post" action="/board/new">
+        <p>
+            <label>Title<br>
+            <input type="text" name="title" required maxlength="120"></label>
+        </p>
+        <p>
+            <label>Description<br>
+            <textarea name="description"></textarea></label>
+        </p>
+        <button type="submit">Create job</button>
+    </form>
+
+    <h2>All jobs</h2>
+
+    {% if jobs %}
+        <ul>
+            {% for job in jobs %}
+        <li>
+            <strong>{{ job.title }}</strong> ({{ job.status }})<br>
+            {{ job.description }}
+            <a href="/board/{{ job.id }}/edit">Edit</a>
+            <form method="post" action="/board/{{ job.id }}/delete" style="display:inline">
+                <button type="submit">Delete</button>
+            </form>
+        </li>
+    {% endfor %}
+        </ul>
+    {% else %}
+        <p>No jobs yet.</p>
+    {% endif %}
+</body>
+</html>

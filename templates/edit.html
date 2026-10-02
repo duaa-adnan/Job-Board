@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit job</title>
+</head>
+<body>
+    <h1>Edit job</h1>
+
+    <form method="post" action="/board/{{ job.id }}/edit">
+        <p>
+            <label>Title<br>
+            <input type="text" name="title" value="{{ job.title }}" required maxlength="120"></label>
+        </p>
+        <p>
+            <label>Description<br>
+            <textarea name="description">{{ job.description }}</textarea></label>
+        </p>
+        <p>
+            <label>Status<br>
+            <select name="status">
+                <option value="open" {% if job.status == "open" %}selected{% endif %}>open</option>
+                <option value="closed" {% if job.status == "closed" %}selected{% endif %}>closed</option>
+            </select></label>
+        </p>
+        <button type="submit">Save</button>
+        <a href="/board">Cancel</a>
+    </form>
+</body>
+</html>
