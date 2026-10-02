@@ -2,10 +2,11 @@ from fastapi import Depends, FastAPI, Form, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from database import Base, engine, get_db
-from models import Job
+from models import Candidate, Job
 from schemas import JobIn, JobOut
 
 app = FastAPI()
@@ -24,6 +25,8 @@ def health():
     return {"status": "ok"}
 
 
+# ---------- JSON API ----------
+
 @app.post("/jobs", response_model=JobOut, status_code=201)
 def create_job(data: JobIn, db: Session = Depends(get_db)):
     job = Job(**data.model_dump())
@@ -36,6 +39,7 @@ def create_job(data: JobIn, db: Session = Depends(get_db)):
 @app.get("/jobs", response_model=list[JobOut])
 def list_jobs(db: Session = Depends(get_db)):
     return db.scalars(select(Job)).all()
+
 
 @app.get("/jobs/{job_id}", response_model=JobOut)
 def get_job(job_id: int, db: Session = Depends(get_db)):
@@ -67,10 +71,13 @@ def delete_job(job_id: int, db: Session = Depends(get_db)):
     db.commit()
 
 
+# ---------- HTML pages ----------
+
 @app.get("/board", include_in_schema=False)
 def board(request: Request, db: Session = Depends(get_db)):
     jobs = db.scalars(select(Job)).all()
     return templates.TemplateResponse(request, "board.html", {"jobs": jobs})
+
 
 @app.post("/board/new", include_in_schema=False)
 def board_create(
@@ -115,4 +122,24 @@ def board_edit_save(
     job.description = description
     job.status = status
     db.commit()
+    return RedirectResponse("/board", status_code=303)
+
+
+@app.post("/board/{job_id}/apply", include_in_schema=False)
+def board_apply(
+    job_id: int,
+    name: str = Form(...),
+    email: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    job = db.get(Job, job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+    if job.status != "open":
+        raise HTTPException(status_code=400, detail="This job is closed")
+    db.add(Candidate(job_id=job_id, name=name.strip(), email=email.strip().lower()))
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
     return RedirectResponse("/board", status_code=303)

@@ -5,7 +5,8 @@
 </head>
 <body>
     <h1>Job Board</h1>
-        <h2>New job</h2>
+
+    <h2>New job</h2>
     <form method="post" action="/board/new">
         <p>
             <label>Title<br>
@@ -22,16 +23,30 @@
 
     {% if jobs %}
         <ul>
-            {% for job in jobs %}
-        <li>
-            <strong>{{ job.title }}</strong> ({{ job.status }})<br>
-            {{ job.description }}
-            <a href="/board/{{ job.id }}/edit">Edit</a>
-            <form method="post" action="/board/{{ job.id }}/delete" style="display:inline">
-                <button type="submit">Delete</button>
-            </form>
-        </li>
-    {% endfor %}
+        {% for job in jobs %}
+            <li>
+                <strong>{{ job.title }}</strong> ({{ job.status }})<br>
+                {{ job.description }}
+                <a href="/board/{{ job.id }}/edit">Edit</a>
+                <form method="post" action="/board/{{ job.id }}/delete" style="display:inline">
+                    <button type="submit">Delete</button>
+                </form>
+
+                <ul>
+                {% for c in job.candidates %}
+                    <li>{{ c.name }} ({{ c.email }}), {{ c.status }}</li>
+                {% endfor %}
+                </ul>
+
+                {% if job.status == "open" %}
+                <form method="post" action="/board/{{ job.id }}/apply">
+                    <input type="text" name="name" placeholder="Name" required maxlength="120">
+                    <input type="email" name="email" placeholder="Email" required maxlength="200">
+                    <button type="submit">Apply</button>
+                </form>
+                {% endif %}
+            </li>
+        {% endfor %}
         </ul>
     {% else %}
         <p>No jobs yet.</p>
