@@ -23,8 +23,8 @@ A small job board I built as a take-home project. Recruiters can post jobs, cand
 You need Python 3.10 or newer.
 
 ```
-git clone <repo-url>
-cd jobboard
+git clone https://github.com/duaa-adnan/Job-Board.git
+cd Job-Board
 py -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
