@@ -1,5 +1,6 @@
 from fastapi import Depends, FastAPI, Form, HTTPException, Request
 from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -11,6 +12,7 @@ from schemas import JobIn, JobOut
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 Base.metadata.create_all(engine)
 
