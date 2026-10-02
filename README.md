@@ -2,6 +2,12 @@
 
 A small job board I built as a take-home project. Recruiters can post jobs, candidates can apply to them, and the recruiter can move each candidate through hiring stages. It's a CRUD app with a Python backend, a SQLite database and a simple web page.
 
+## Live demo
+
+https://job-board-11131.containers.snapdeploy.app/board
+
+This runs on a free hosting plan. If nobody has opened it for a while, the first load can take up to a minute while it wakes up. The demo data also resets whenever the app restarts, because the free plan doesn't keep the SQLite file.
+
 ## What it does
 
 - Create, view, edit and delete jobs
