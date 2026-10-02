@@ -34,7 +34,20 @@
 
                 <ul>
                 {% for c in job.candidates %}
-                    <li>{{ c.name }} ({{ c.email }}), {{ c.status }}</li>
+                    <li>
+                        {{ c.name }} ({{ c.email }}), {{ c.status }}
+                        <form method="post" action="/board/candidates/{{ c.id }}/status" style="display:inline">
+                            <select name="status">
+                            {% for s in statuses %}
+                                <option value="{{ s }}" {% if c.status == s %}selected{% endif %}>{{ s }}</option>
+                            {% endfor %}
+                            </select>
+                            <button type="submit">Update</button>
+                        </form>
+                        <form method="post" action="/board/candidates/{{ c.id }}/delete" style="display:inline">
+                            <button type="submit">Remove</button>
+                        </form>
+                    </li>
                 {% endfor %}
                 </ul>
 

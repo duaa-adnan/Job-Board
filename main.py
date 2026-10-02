@@ -14,6 +14,8 @@ templates = Jinja2Templates(directory="templates")
 
 Base.metadata.create_all(engine)
 
+CANDIDATE_STATUSES = ("applied", "interviewing", "hired", "rejected")
+
 
 @app.get("/")
 def home():
@@ -76,7 +78,9 @@ def delete_job(job_id: int, db: Session = Depends(get_db)):
 @app.get("/board", include_in_schema=False)
 def board(request: Request, db: Session = Depends(get_db)):
     jobs = db.scalars(select(Job)).all()
-    return templates.TemplateResponse(request, "board.html", {"jobs": jobs})
+    return templates.TemplateResponse(
+        request, "board.html", {"jobs": jobs, "statuses": CANDIDATE_STATUSES}
+    )
 
 
 @app.post("/board/new", include_in_schema=False)
@@ -142,4 +146,29 @@ def board_apply(
         db.commit()
     except IntegrityError:
         db.rollback()
+    return RedirectResponse("/board", status_code=303)
+
+
+@app.post("/board/candidates/{candidate_id}/status", include_in_schema=False)
+def candidate_set_status(
+    candidate_id: int,
+    status: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    candidate = db.get(Candidate, candidate_id)
+    if candidate is None:
+        raise HTTPException(status_code=404, detail="Candidate not found")
+    if status not in CANDIDATE_STATUSES:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    candidate.status = status
+    db.commit()
+    return RedirectResponse("/board", status_code=303)
+
+
+@app.post("/board/candidates/{candidate_id}/delete", include_in_schema=False)
+def candidate_delete(candidate_id: int, db: Session = Depends(get_db)):
+    candidate = db.get(Candidate, candidate_id)
+    if candidate is not None:
+        db.delete(candidate)
+        db.commit()
     return RedirectResponse("/board", status_code=303)
