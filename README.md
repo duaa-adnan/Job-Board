@@ -58,11 +58,3 @@ The database file (`jobs.db`) is created automatically the first time the app st
 | DELETE | `/jobs/{id}` | Delete a job |
 
 Candidates are handled through the web page (`/board`) and don't have a JSON API yet.
-
-## What I would add next
-
-- A JSON API for candidates, like the one for jobs
-- Login, so only recruiters can edit jobs and move candidates
-- Validation on the web forms that matches the API rules
-- Automated tests
-- A move to PostgreSQL if it ever needed real traffic
